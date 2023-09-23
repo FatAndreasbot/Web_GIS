@@ -23,3 +23,6 @@ go.work
 # Database
 DB.db
 
+# IDE stuff
+.vscode/
+
