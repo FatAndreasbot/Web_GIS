@@ -9,6 +9,10 @@ import (
 )
 
 func GetPlayers(c *gin.Context) {
+	// ideally that should be replaced by an anonomous struct, but for now that'll do
+	// especially if you take in considiration, that i most likely will remove/rework the Player
+	// model completly, but whatever
+
 	var players []models.Player
 	config.DB.Find(&players)
 
@@ -24,13 +28,13 @@ func PostPlayers(c *gin.Context) {
 
 	config.DB.Create(&input)
 
-	c.IndentedJSON(http.StatusOK, gin.H{"data": input})
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": input})
 }
 
 func GetPlayerById(c *gin.Context) {
 	var player models.Player
 
-	err := config.DB.Where("id = ?", c.Param("id")).First(&player).Error
+	err := config.DB.Model(models.Player{}).Where("id = ?", c.Param("id")).First(&player).Error
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -42,7 +46,7 @@ func GetPlayerById(c *gin.Context) {
 func PatchPlayerByID(c *gin.Context) {
 	var player, input models.Player
 
-	err := config.DB.Where("id = ?", c.Param("id")).First(&player).Error
+	err := config.DB.Model(models.Player{}).Where("id = ?", c.Param("id")).First(&player).Error
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -62,7 +66,7 @@ func PatchPlayerByID(c *gin.Context) {
 func DeletePlayer(c *gin.Context) {
 	var player models.Player
 
-	err := config.DB.Where("id = ?", c.Param("id")).First(&player).Error
+	err := config.DB.Model(models.Player{}).Where("id = ?", c.Param("id")).First(&player).Error
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -1,0 +1,11 @@
+go 1.20
+
+use (
+	.
+	./config
+	./controllers
+	./middleware
+	./models
+	./utils
+	./views
+)
