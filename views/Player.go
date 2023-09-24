@@ -16,5 +16,4 @@ func Player_CRUD_endpoints(r *gin.Engine) {
 
 	r.DELETE("/players/:id", controllers.DeletePlayer)
 
-	r.Run("localhost:8080")
 }

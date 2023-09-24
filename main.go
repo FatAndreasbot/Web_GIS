@@ -13,4 +13,6 @@ func main() {
 	config.DB_init()
 
 	views.Player_CRUD_endpoints(r)
+
+	r.Run("localhost:8080")
 }
