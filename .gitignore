@@ -21,7 +21,7 @@
 *.sum
 
 # Database
-DB.db
+*.db
 
 # IDE stuff
 .vscode/
