@@ -25,4 +25,5 @@
 
 # IDE stuff
 .vscode/
+testdata.json
 

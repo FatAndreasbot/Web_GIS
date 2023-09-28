@@ -3,6 +3,8 @@ package main
 import (
 	"controllers"
 	"log"
+	"middleware"
+	"models"
 	"utils"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +12,7 @@ import (
 )
 
 func DB_Init() *gorm.DB {
-	db, err := utils.SetupDB()
+	db, err := models.SetupDB()
 	if err != nil {
 		log.Println("Problem setting up database")
 	}
@@ -24,6 +26,10 @@ func SetupRouter() *gin.Engine {
 
 	r.POST("/register", server.Register)
 	r.POST("/login", server.Login)
+
+	authorized := r.Group("/user")
+	authorized.Use(middleware.JwtAuthMiddleware())
+	authorized.POST("/create_character", server.PostCharacter)
 
 	return r
 }

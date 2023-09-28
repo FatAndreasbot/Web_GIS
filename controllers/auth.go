@@ -20,6 +20,7 @@ func NewServer(db *gorm.DB) *Server {
 
 func (s *Server) Register(c *gin.Context) {
 	type registerInput struct {
+		Login    string `json:"login" binding:"required"`
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
@@ -30,7 +31,7 @@ func (s *Server) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 
-	user := models.User{Username: input.Username, Password: input.Password}
+	user := models.User{Username: input.Username, Password: input.Password, Login: input.Login}
 	user.HashPassword()
 
 	err = s.db.Create(&user).Error
@@ -43,16 +44,16 @@ func (s *Server) Register(c *gin.Context) {
 
 func (s *Server) Login(c *gin.Context) {
 	type loginInput struct {
-		Username string `json:"Username" binding:"required"`
+		Login    string `json:"login" binding:"required"`
 		Password string `json:"Password" binding:"required"`
 	}
 
-	loginCheck := func(username, password string) (string, error) {
+	loginCheck := func(login, password string) (string, error) {
 		var err error
 
 		user := models.User{}
 
-		if err = s.db.Model(models.User{}).Where("username=?", username).Take(&user).Error; err != nil {
+		if err = s.db.Model(models.User{}).Where("login=?", login).Take(&user).Error; err != nil {
 			return "", err
 		}
 
@@ -78,14 +79,17 @@ func (s *Server) Login(c *gin.Context) {
 		return
 	}
 
-	user := models.User{Username: input.Username, Password: input.Password}
+	user := models.User{Login: input.Login, Password: input.Password}
 
-	token, err := loginCheck(user.Username, user.Password)
+	token, err := loginCheck(user.Login, user.Password)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "The username or password is not correct"})
 		return
 	}
+
+	// send cookie to user
+	// c.SetCookie("auth_cookie", token, 604800, "/", "localhost", true, true)
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }

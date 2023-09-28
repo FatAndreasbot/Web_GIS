@@ -1,8 +1,7 @@
-package utils
+package models
 
 import (
 	"log"
-	"models"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -14,12 +13,17 @@ func SetupDB() (*gorm.DB, error) {
 		log.Fatal(err.Error())
 	}
 
-	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&User{})
 	if err != nil {
 		log.Println(err)
 	}
 
-	err = db.AutoMigrate(&models.Quest{})
+	err = db.AutoMigrate(&Quest{})
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = db.AutoMigrate(&Character{})
 	if err != nil {
 		log.Println(err)
 	}
