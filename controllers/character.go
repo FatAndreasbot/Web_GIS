@@ -68,3 +68,20 @@ func (s *Server) DeleteCharacter(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Character deleted"})
 }
+
+func (s *Server) GetCharacter(c *gin.Context) {
+	character := models.Character{}
+
+	user, err := utils.CurrentUser(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = s.db.Where("user_id = ?", user.ID).Take(&character).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": character})
+}

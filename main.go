@@ -35,6 +35,7 @@ func SetupRouter() *gin.Engine {
 
 	authorized.POST("/character", server.PostCharacter)
 	authorized.DELETE("/character", server.DeleteCharacter)
+	authorized.GET("/character", server.GetCharacter)
 
 	return r
 }
