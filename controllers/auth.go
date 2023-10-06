@@ -3,6 +3,8 @@ package controllers
 import (
 	"models"
 	"net/http"
+	"os"
+	"strconv"
 	"utils"
 
 	"github.com/gin-gonic/gin"
@@ -90,6 +92,29 @@ func (s *Server) Login(c *gin.Context) {
 
 	// send cookie to user
 	// c.SetCookie("auth_cookie", token, 604800, "/", "localhost", true, true)
+
+	tokenHourLifespan, _ := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
+	c.SetCookie("gin_auth_cookie", token,
+		3600*tokenHourLifespan, "/", os.Getenv("DOMAIN_NAME"), true, true)
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func (s *Server) UpdateToken(c *gin.Context) {
+	user, err := utils.CurrentUser(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	token, err := utils.GenerateToken(user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	tokenHourLifespan, _ := strconv.Atoi(os.Getenv("TOKEN_HOUR_LIFESPAN"))
+	c.SetCookie("gin_auth_cookie", token,
+		3600*tokenHourLifespan, "/", os.Getenv("DOMAIN_NAME"), true, true)
 
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }

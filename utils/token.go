@@ -49,6 +49,12 @@ func ValidateToken(c *gin.Context) error {
 func GetToken(c *gin.Context) (*jwt.Token, error) {
 	// returns the token string
 	getTokenFromRequest := func(c *gin.Context) string {
+
+		token, err := c.Cookie("gin_auth_cookie")
+		if err == nil {
+			return token
+		}
+
 		bearerToken := c.Request.Header.Get("Authorization")
 
 		splitToken := strings.Split(bearerToken, " ")
@@ -56,6 +62,7 @@ func GetToken(c *gin.Context) (*jwt.Token, error) {
 			token := splitToken[1]
 			return token
 		}
+
 		return ""
 	}
 

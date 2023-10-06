@@ -2,9 +2,11 @@ package main
 
 import (
 	"controllers"
+	"fmt"
 	"log"
 	"middleware"
 	"models"
+	"os"
 	"utils"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +31,10 @@ func SetupRouter() *gin.Engine {
 
 	authorized := r.Group("/user")
 	authorized.Use(middleware.JwtAuthMiddleware())
-	authorized.POST("/create_character", server.PostCharacter)
+	authorized.GET("/update_token", server.UpdateToken)
+
+	authorized.POST("/character", server.PostCharacter)
+	authorized.DELETE("/character", server.DeleteCharacter)
 
 	return r
 }
@@ -38,5 +43,5 @@ func main() {
 	r := SetupRouter()
 	utils.SetEnv()
 
-	r.Run("localhost:8080")
+	r.Run(fmt.Sprintf("%s:%s", os.Getenv("DOMAIN_NAME"), "8080"))
 }

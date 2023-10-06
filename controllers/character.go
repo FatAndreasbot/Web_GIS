@@ -40,10 +40,31 @@ func (s *Server) PostCharacter(c *gin.Context) {
 		UserID:    user.ID,
 	}
 
+	if err := s.db.Where("user_id = ?", character.UserID).Take(&models.Character{}).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User already has a character"})
+		return
+	}
+
 	if err := s.db.Create(&character).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "success", "data": character})
+}
+
+func (s *Server) DeleteCharacter(c *gin.Context) {
+	user, err := utils.CurrentUser(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	character := models.Character{}
+	err = s.db.Where("user_id = ?", user.ID).Delete(&character).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Character deleted"})
 }

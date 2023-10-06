@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Character struct {
 	gorm.Model
-	UserID    uint `gorm:"ForeignKey:UserID; unique"`
+	UserID    uint `gorm:"ForeignKey:user_id"`
 	Name      string
 	MaxHealth int
 	Health    int
