@@ -85,3 +85,50 @@ func (s *Server) GetCharacter(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": character})
 }
+
+func (s *Server) UpdateCharacter(c *gin.Context) {
+	type newCharacter struct {
+		Name      string `json:"Name" binding:"required"`
+		MaxHealth int    `json:"MaxHealth" binding:"required"`
+		Health    int    `json:"Health" binding:"required"`
+		AC        int    `json:"AC" binding:"required"`
+		Strenght  int    `json:"Strenght" binding:"required"`
+		Dexterity int    `json:"Dexterity" binding:"required"`
+	}
+
+	user, err := utils.CurrentUser(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var charData newCharacter
+	if err := c.BindJSON(&charData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	character := models.Character{}
+
+	err = s.db.Where("user_id = ?", user.ID).Take(&character).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	character.Name = charData.Name
+	character.MaxHealth = charData.MaxHealth
+	character.Health = charData.Health
+	character.AC = charData.AC
+	character.Strenght = charData.Strenght
+	character.Dexterity = charData.Dexterity
+
+	err = s.db.Save(character).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "data updated", "data": character})
+
+}
